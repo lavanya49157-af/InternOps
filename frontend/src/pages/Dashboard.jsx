@@ -5,8 +5,10 @@ import Ratings from './Ratings'
 import Tasks from './Tasks'
 import AdminDashboard from './admin/AdminDashboard'
 import Notifications from './Notifications'
+import Profile from './Profile'
 import Sessions from './Sessions'
 import Meetings from './Meetings'
+import AuditLog from './admin/AuditLog'
 import Analytics from './admin/Analytics'
 import Reports from './admin/Reports'
 const isAdmin = JSON.parse(localStorage.getItem('user')||'{}').role === 'ADMIN';
@@ -15,10 +17,12 @@ const nav = [
   { path:'/attendance', label:'Attendance' },
   { path:'/ratings', label:'Ratings' },
   { path:'/tasks', label:'Tasks' },
+  { path:'/profile', label:'Profile' },
   { path:'/notifications', label:'Notifications' },
   { path:'/sessions', label:'Sessions' },
   { path:'/meetings', label:'Meetings' },
-  { path:'/analytics', label:'Analytics' },
+  { path:'/audit', label:'Audit Log' },
+  ...(isAdmin ? [{ path:'/analytics', label:'Analytics' }] : [])
   { path:'/reports', label:'Reports' },
   ...(isAdmin ? [{ path:'/admin', label:'Admin Panel' }] : [])
 ]
@@ -40,9 +44,11 @@ export default function Dashboard() {
           <Route path="attendance" element={<Attendance />} />
           <Route path="ratings" element={<Ratings />} />
           <Route path="tasks" element={<Tasks />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="sessions" element={<Sessions />} />
           <Route path="meetings" element={<Meetings />} />
+          <Route path="audit" element={<AuditLog />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="reports" element={<Reports />} />`n          {isAdmin && <Route path="admin" element={<AdminDashboard />} />}
         </Routes>
@@ -50,6 +56,7 @@ export default function Dashboard() {
     </div>
   )
 }
+
 
 
 
