@@ -49,14 +49,57 @@ async function refreshTokens(token, ip) {
   const hash = hashToken(token);
   const pool = require('../../config/db');
   const { rows } = await pool.query('SELECT * FROM refresh_tokens WHERE token_hash=$1 AND revoked=FALSE AND expires_at>NOW()', [hash]);
-  if(rows.length===0) throw new UnauthorizedError('Token revoked/expired');
-  await repo.revokeRefreshTokenRedis(hash);
+ async function refreshTokens(token, ip) {
+  let decoded;
+
+  try {
+    decoded = verifyRefreshToken(token);
+  } catch {
+    throw new UnauthorizedError('Invalid refresh token');
+  }
+
+  const hash = hashToken(token);
+  const pool = require('../../config/db');
+
+  const { rows } = await pool.query(
+    'SELECT * FROM refresh_tokens WHERE token_hash=$1 AND revoked=FALSE AND expires_at>NOW()',
+    [hash]
+  );
+
+  if (rows.length === 0) {
+    throw new UnauthorizedError('Token revoked/expired');
+  }
+
+  // Verify user BEFORE revoking old token
   const user = await repo.findById(decoded.id);
-  if(!user||user.suspended) throw new UnauthorizedError('User not found/suspended');
+
+  if (!user || user.suspended) {
+    throw new UnauthorizedError('User not found/suspended');
+  }
+
+  // Generate replacement tokens
   const newAccess = generateAccessToken(user);
   const newRefresh = generateRefreshToken(user);
-  const newExpiry = new Date(Date.now()+7*24*60*60*1000);
-  await repo.storeRefreshTokenRedis(user.id, hashToken(newRefresh), newExpiry);
+
+  const newExpiry = new Date(
+    Date.now() + 7 * 24 * 60 * 60 * 1000
+  );
+
+  // Store new token first
+  await repo.storeRefreshTokenRedis(
+    user.id,
+    hashToken(newRefresh),
+    newExpiry
+  );
+
+  // Revoke old token only after successful storage
+  await repo.revokeRefreshTokenRedis(hash);
+
+  return {
+    accessToken: newAccess,
+    refreshToken: newRefresh
+  };
+}
   return { accessToken:newAccess, refreshToken:newRefresh };
 }
 
