@@ -16,7 +16,7 @@ jobs:
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: internops_test
+          POSTGRES_DB: root
         ports:
           - 5432:5432
         options: >-
@@ -49,8 +49,9 @@ jobs:
       - name: Install backend dependencies
         run: cd backend && npm ci
 
-      # Note: The manual "Wait for PostgreSQL" step using pg_isready has been removed 
-      # to prevent "command not found" errors on the host runner.
+      # ✅ Force-creates the internops_test target database if the application configuration expects it specifically
+      - name: Create fallback testing database
+        run: PGPASSWORD=postgres psql -h localhost -U root -d root -c "CREATE DATABASE internops_test;"
 
       - name: Run migrations
         run: cd backend && npm run migrate
