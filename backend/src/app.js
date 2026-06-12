@@ -1,13 +1,5 @@
 // loadEnvironment();
 require("dotenv").config();
-
-// validateEnvironment();
-const validateEnv = require("./config/validateEnv");
-validateEnv();
-
-// initializeDatabase();
-const db = require("./config/db");
-
 const Fastify = require("fastify");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");

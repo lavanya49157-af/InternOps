@@ -19,7 +19,7 @@ export default function AttendanceMarkForm() {
 
   const markMutation = useMutation({
     mutationFn: (data) => api.post('/attendance/mark', data),
-    onSuccess: () => { queryClient.invalidateQueries(['attendance']); setError(''); setMsg('✓ Attendance marked'); setTimeout(() => setMsg(''), 2000) },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['attendance'] }); setError(''); setMsg('✓ Attendance marked'); setTimeout(() => setMsg(''), 2000) },
     onError: (err) => setError(err.response?.data?.error || 'Failed'),
   })
 
