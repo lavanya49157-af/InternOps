@@ -98,14 +98,23 @@ export default function Attendance() {
             No attendance records for {selectedName || 'this user'}.
           </div>
         ) : (
-          <>
-            <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 text-left text-gray-600">
-                  <tr>
-                    <th className="p-3">Date</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Remarks</th>
+          <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-left text-gray-600">
+                <tr>
+                  <th className="p-3">Date</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3">Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {records.map(a => (
+                  <tr key={a.id} className="border-t hover:bg-gray-50">
+                    <td className="p-2 border">
+                      {new Date(a.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </td>
+                    <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BADGE[a.status] || ''}`}>{a.status}</span></td>
+                    <td className="p-3">{a.remarks || '—'}</td>
                   </tr>
                 </thead>
                 <tbody>
