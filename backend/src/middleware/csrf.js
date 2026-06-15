@@ -28,8 +28,9 @@ const EXEMPT = [
 
 const csrfMiddleware = async (request, reply) => {
   if (['GET', 'HEAD', 'OPTIONS'].includes(request.method)) return;
+  if (!request.url) return; 
   if (EXEMPT.some((p) => request.url.startsWith(p))) return;
-  
+
   const token = request.headers['x-csrf-token'];
   if (!token || !verifyToken(token)) {
     return reply.status(403).send({ error: 'CSRF token missing or invalid' });
