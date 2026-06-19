@@ -2,7 +2,6 @@ const { z } = require('zod');
 const auth = require('../../middleware/auth');
 const rbac = require('../../middleware/rbac');
 const repo = require('./repository');
-
 async function routes(fastify) {
   fastify.get(
     '/overview',
@@ -91,12 +90,18 @@ async function routes(fastify) {
         months: z.coerce.number().int().min(1).max(24).default(6),
         departmentId: z.string().uuid().optional(),
       });
-      const { months, departmentId } = schema.parse(req.query);
-      const scopedDeptId =
+      const validation = schema.safeParse(req.query);
+      if (!validation.success) {
+        return reply.status(400).send({
+          error: 'Validation failed',
+          details: validation.error.errors,
+        });
+      }
+      const { months, departmentId } = validation.data;
+      const scopeDeptId =
         req.user.role === 'ADMIN' ? departmentId : req.user.departmentId;
       return repo.attendanceTrends(months, scopedDeptId);
     }
   );
 }
-
 module.exports = routes;
