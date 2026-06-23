@@ -32,6 +32,35 @@ async function routes(fastify) {
           ? messages
           : [{ role: 'user', content: prompt }];
 
+const MAX_MESSAGES = 32;
+const MAX_MESSAGE_CHARS = 4000;
+const MAX_TOTAL_CHARS = 32000;
+if (finalMessages.length > MAX_MESSAGES) {
+  return reply.status(413).send({
+    error: 'Too many messages',
+  });
+}
+
+let totalChars = 0;
+
+for (const msg of finalMessages) {
+  const content = String(msg.content || '');
+
+  if (content.length > MAX_MESSAGE_CHARS) {
+    return reply.status(413).send({
+      error: 'Message exceeds maximum length',
+    });
+  }
+
+  totalChars += content.length;
+}
+
+if (totalChars > MAX_TOTAL_CHARS) {
+  return reply.status(413).send({
+    error: 'Prompt too long',
+  });
+}
+
       if (!finalMessages[0]?.content) {
         return reply.status(400).send({
           error: 'Prompt or messages are required',
@@ -40,10 +69,9 @@ async function routes(fastify) {
 
       try {
         const result = await generateAIResponse({
-          userId: req.user.id,
-          messages: finalMessages,
-          userId: req.user.id,
-        });
+  userId: req.user.id,
+  messages: finalMessages,
+});
         return {
           provider: result.provider,
           cached: result.cached,
