@@ -214,21 +214,15 @@ export default function CreateUserModal({ open, onClose }) {
                 className="w-full pl-10 pr-12 py-2.5 rounded-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:border-brand-green focus:ring-2 focus:ring-brand-green/30 outline-none transition text-sm"
               />
               <button
-  type="button"
-  onClick={() => setShowPassword((s) => !s)}
-  aria-label={showPassword ? 'Hide password' : 'Show password'}
-  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
->
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+              >
                 {showPassword ? (
-                  <EyeOff
-  className="w-5 h-5"
-  aria-hidden="true"
-/>
+                  <EyeOff className="w-5 h-5" aria-hidden="true" />
                 ) : (
-                  <Eye
-  className="w-5 h-5"
-  aria-hidden="true"
-/>
+                  <Eye className="w-5 h-5" aria-hidden="true" />
                 )}
               </button>
             </div>
