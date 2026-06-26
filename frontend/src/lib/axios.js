@@ -14,24 +14,39 @@ const api = axios.create({
 // which is the correct behaviour when CSRF protection is unavailable.
 let csrfToken = null;
 let csrfPromise = null;
+let csrfGeneration = 0;
 
 async function getCsrfToken() {
-  if (csrfToken) return csrfToken;
-  if (csrfPromise) return csrfPromise;
+  if (csrfToken) {
+    return csrfToken;
+  }
+
+  if (csrfPromise) {
+    return csrfPromise;
+  }
+
+  const generation = csrfGeneration;
+
   csrfPromise = api
     .get('/auth/csrf-token')
     .then((res) => {
+      // Ignore stale responses that finished after a token reset.
+      if (generation !== csrfGeneration) {
+        throw new Error('Discarding stale CSRF token');
+      }
+
       csrfToken = res.data.csrfToken;
       return csrfToken;
     })
-    .catch((err) => {
+    .finally(() => {
       csrfPromise = null;
-      throw err;
     });
+
   return csrfPromise;
 }
 
 function clearCsrfToken() {
+  csrfGeneration++;
   csrfToken = null;
   csrfPromise = null;
 }
