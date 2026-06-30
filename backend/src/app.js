@@ -33,7 +33,7 @@ app.register(require('@fastify/helmet'), {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:"],
+      imgSrc: ["'self'", 'data:'],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       frameAncestors: ["'none'"],
@@ -190,21 +190,22 @@ app.get(
     },
   },
   async (req, reply) => {
-  const { getRedisStatus } = require('./config/redis');
-  const redisStatus = getRedisStatus();
+    const { getRedisStatus } = require('./config/redis');
+    const redisStatus = getRedisStatus();
 
-  if (process.env.NODE_ENV === 'test') {
+    if (process.env.NODE_ENV === 'test') {
+      return reply.send({ status: 'ok' });
+    }
+
+    if (redisStatus === 'disconnected') {
+      return reply
+        .status(503)
+        .send({ status: 'degraded', redis: 'disconnected' });
+    }
+
     return reply.send({ status: 'ok' });
   }
-
-  if (redisStatus === 'disconnected') {
-    return reply
-      .status(503)
-      .send({ status: 'degraded', redis: 'disconnected' });
-  }
-
-  return reply.send({ status: 'ok' });
-});
+);
 
 app.get(
   '/health/db',
@@ -214,19 +215,20 @@ app.get(
     },
   },
   async (req, reply) => {
-  try {
-    await pool.query('SELECT 1');
-    reply.send({
-      status: 'ok',
-      db: 'connected',
-    });
-  } catch {
-    reply.status(503).send({
-      status: 'error',
-      db: 'disconnected',
-    });
+    try {
+      await pool.query('SELECT 1');
+      reply.send({
+        status: 'ok',
+        db: 'connected',
+      });
+    } catch {
+      reply.status(503).send({
+        status: 'error',
+        db: 'disconnected',
+      });
+    }
   }
-});
+);
 
 app.get(
   '/health/full',
@@ -236,27 +238,28 @@ app.get(
     },
   },
   async (req, reply) => {
-  const checks = { db: false, redis: false };
+    const checks = { db: false, redis: false };
 
-  try {
-    await pool.query('SELECT 1');
-    checks.db = true;
-  } catch {}
+    try {
+      await pool.query('SELECT 1');
+      checks.db = true;
+    } catch {}
 
-  const { getRedisStatus } = require('./config/redis');
-  const redisStatus = getRedisStatus();
+    const { getRedisStatus } = require('./config/redis');
+    const redisStatus = getRedisStatus();
 
-  checks.redis =
-    process.env.NODE_ENV === 'test' ||
-    redisStatus === 'connected' ||
-    redisStatus === 'disabled';
+    checks.redis =
+      process.env.NODE_ENV === 'test' ||
+      redisStatus === 'connected' ||
+      redisStatus === 'disabled';
 
-  const healthy = checks.db && checks.redis;
+    const healthy = checks.db && checks.redis;
 
-  reply
-    .status(healthy ? 200 : 503)
-    .send({ status: healthy ? 'healthy' : 'degraded', checks });
-});
+    reply
+      .status(healthy ? 200 : 503)
+      .send({ status: healthy ? 'healthy' : 'degraded', checks });
+  }
+);
 
 app.addHook('onRequest', metrics.trackActiveRequests);
 
