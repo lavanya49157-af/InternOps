@@ -27,7 +27,19 @@ app.register(require('@fastify/cors'), {
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
 });
 
-app.register(require('@fastify/helmet'));
+app.register(require('@fastify/helmet'), {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'none'"],
+    },
+  },
+});
 
 //  Register once globally — no Redis dependency
 app.register(require('@fastify/rate-limit'), {
@@ -160,9 +172,24 @@ app.get('/fallback', async (req, reply) => {
   `);
 });
 
-app.get('/metrics', metrics.metricsEndpoint);
+app.get(
+  '/metrics',
+  {
+    config: {
+      rateLimit: false,
+    },
+  },
+  metrics.metricsEndpoint
+);
 
-app.get('/health', async (req, reply) => {
+app.get(
+  '/health',
+  {
+    config: {
+      rateLimit: false,
+    },
+  },
+  async (req, reply) => {
   const { getRedisStatus } = require('./config/redis');
   const redisStatus = getRedisStatus();
 
@@ -179,7 +206,14 @@ app.get('/health', async (req, reply) => {
   return reply.send({ status: 'ok' });
 });
 
-app.get('/health/db', async (req, reply) => {
+app.get(
+  '/health/db',
+  {
+    config: {
+      rateLimit: false,
+    },
+  },
+  async (req, reply) => {
   try {
     await pool.query('SELECT 1');
     reply.send({
@@ -194,7 +228,14 @@ app.get('/health/db', async (req, reply) => {
   }
 });
 
-app.get('/health/full', async (req, reply) => {
+app.get(
+  '/health/full',
+  {
+    config: {
+      rateLimit: false,
+    },
+  },
+  async (req, reply) => {
   const checks = { db: false, redis: false };
 
   try {
