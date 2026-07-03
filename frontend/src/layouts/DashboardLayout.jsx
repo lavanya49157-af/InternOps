@@ -27,6 +27,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import api from '../lib/axios';
 import { UserAvatar, ConfirmationModal } from '../components/ui';
 import useAuthStore from '../store/auth';
+import { QUERY_KEYS } from '../constants/queryKeys';
 
 const ROLE_LABEL = {
   ADMIN: 'Admin',
@@ -135,7 +136,7 @@ export default function DashboardLayout() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const { data: me } = useQuery({
-    queryKey: ['myProfile'],
+    queryKey: QUERY_KEYS.USER_PROFILE,
     queryFn: () => api.get('/users/me').then((r) => r.data),
   });
 
