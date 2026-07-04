@@ -38,7 +38,10 @@ describe('AI Chat Integration Tests (#498)', () => {
     });
   }
 
-  async function login(email = SEEDED_ADMIN_EMAIL, password = SEEDED_ADMIN_PASSWORD) {
+  async function login(
+    email = SEEDED_ADMIN_EMAIL,
+    password = SEEDED_ADMIN_PASSWORD
+  ) {
     const res = await app.inject({
       method: 'POST',
       url: '/api/auth/login',
@@ -253,8 +256,11 @@ describe('AI Chat Integration Tests (#498)', () => {
         },
       });
       expect(regRes.statusCode).toBe(201);
-      await pool.query('UPDATE users SET email_verified = TRUE WHERE email = $1', [uniqueEmail]);
-      
+      await pool.query(
+        'UPDATE users SET email_verified = TRUE WHERE email = $1',
+        [uniqueEmail]
+      );
+
       cookies = {};
       const csrfRes2 = await app.inject({
         method: 'GET',
@@ -342,8 +348,11 @@ describe('AI Chat Integration Tests (#498)', () => {
         },
       });
       expect(regRes.statusCode).toBe(201);
-      await pool.query('UPDATE users SET email_verified = TRUE WHERE email = $1', [uniqueEmail]);
-      
+      await pool.query(
+        'UPDATE users SET email_verified = TRUE WHERE email = $1',
+        [uniqueEmail]
+      );
+
       cookies = {};
       const csrfRes2 = await app.inject({
         method: 'GET',

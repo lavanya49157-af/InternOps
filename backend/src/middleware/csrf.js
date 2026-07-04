@@ -109,7 +109,10 @@ function getOrCreateToken(request, reply) {
     const sid = newSessionId();
     writeSession(reply, sid, tokenUserId);
     session = { sid, userId: tokenUserId };
-  } else if (tokenUserId && String(session.userId || '') !== String(tokenUserId)) {
+  } else if (
+    tokenUserId &&
+    String(session.userId || '') !== String(tokenUserId)
+  ) {
     const sid = newSessionId();
     writeSession(reply, sid, tokenUserId);
     session = { sid, userId: tokenUserId };

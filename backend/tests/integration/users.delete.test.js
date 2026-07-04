@@ -73,7 +73,9 @@ beforeAll(async () => {
 
   // Clean up other users/admins that might be lingering from other tests
   try {
-    await pool.query("DELETE FROM users WHERE role = 'ADMIN' AND email <> $1", [SEEDED_ADMIN_EMAIL]);
+    await pool.query("DELETE FROM users WHERE role = 'ADMIN' AND email <> $1", [
+      SEEDED_ADMIN_EMAIL,
+    ]);
   } catch (err) {
     await pool.query('DELETE FROM refresh_tokens').catch(() => {});
     await pool.query('DELETE FROM ratings').catch(() => {});
@@ -86,10 +88,10 @@ beforeAll(async () => {
   }
 
   // Suspend any other admins that couldn't be deleted due to FK constraints
-  await pool.query("UPDATE users SET suspended = TRUE WHERE role = 'ADMIN' AND email <> $1 AND email <> $2", [
-    SEEDED_ADMIN_EMAIL,
-    SECOND_ADMIN_EMAIL
-  ]);
+  await pool.query(
+    "UPDATE users SET suspended = TRUE WHERE role = 'ADMIN' AND email <> $1 AND email <> $2",
+    [SEEDED_ADMIN_EMAIL, SECOND_ADMIN_EMAIL]
+  );
 
   // Clean up any prior-run fixtures
   await hardDelete(TEST_EMAILS);
