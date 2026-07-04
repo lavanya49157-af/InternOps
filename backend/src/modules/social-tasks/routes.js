@@ -30,18 +30,18 @@ const assignTaskSchema = z.object({
 });
 
 // Added submission validation schema with custom refinement rule
-const submitProofSchema = z.object({
-  proofUrl: z.string().url(),
-  did_comment: z.boolean().default(false),
-  did_repost: z.boolean().default(false),
-  did_share: z.boolean().default(false),
-}).refine(
-  (data) => data.did_comment || data.did_repost || data.did_share,
-  {
-    message: "You must perform at least one action (Comment, Repost, or Share) to submit proof.",
-    path: ["did_comment"],
-  }
-);
+const submitProofSchema = z
+  .object({
+    proofUrl: z.string().url(),
+    did_comment: z.boolean().default(false),
+    did_repost: z.boolean().default(false),
+    did_share: z.boolean().default(false),
+  })
+  .refine((data) => data.did_comment || data.did_repost || data.did_share, {
+    message:
+      'You must perform at least one action (Comment, Repost, or Share) to submit proof.',
+    path: ['did_comment'],
+  });
 
 module.exports = async function socialTasksRoutes(fastify) {
   // Create a social task (Admin / Senior TL).
@@ -151,7 +151,10 @@ module.exports = async function socialTasksRoutes(fastify) {
   fastify.post(
     '/:id/submit',
     {
-      schema: { tags: ['Tasks'], description: 'Submit task proof with engagement actions' },
+      schema: {
+        tags: ['Tasks'],
+        description: 'Submit task proof with engagement actions',
+      },
       preHandler: [auth, rbac('INTERN'), sanitize],
     },
     async (req, reply) => {
@@ -162,7 +165,7 @@ module.exports = async function socialTasksRoutes(fastify) {
           details: parsed.error.issues,
         });
       }
-      
+
       const { proofUrl, did_comment, did_repost, did_share } = parsed.data;
 
       const submission = await repo.submitProof({
@@ -171,7 +174,7 @@ module.exports = async function socialTasksRoutes(fastify) {
         proofUrl,
         did_comment,
         did_repost,
-        did_share
+        did_share,
       });
 
       req.auditOnResponse = {
