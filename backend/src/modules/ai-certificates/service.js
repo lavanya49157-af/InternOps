@@ -5,7 +5,8 @@ const fs = require('fs');
 // Helper: Call Python AI server (using native fetch)
 // ============================================================
 
-const PYTHON_SERVER_URL = process.env.PYTHON_AI_SERVER_URL || 'http://localhost:8080';
+const PYTHON_SERVER_URL =
+  process.env.PYTHON_AI_SERVER_URL || 'http://localhost:8080';
 
 async function callPythonEndpoint(endpoint, data, method = 'POST') {
   const url = `${PYTHON_SERVER_URL}${endpoint}`;
