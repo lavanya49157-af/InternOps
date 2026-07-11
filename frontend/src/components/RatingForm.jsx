@@ -12,7 +12,7 @@ export default function RatingForm() {
   const [remarks, setRemarks] = useState('');
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
-  
+
   // Track modal visibility status
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -57,7 +57,8 @@ export default function RatingForm() {
   ];
 
   // Dynamically extract the name or email of the selected team member
-  const selectedUserLabel = memberOptions.find((opt) => opt.value === userId)?.label || 'this member';
+  const selectedUserLabel =
+    memberOptions.find((opt) => opt.value === userId)?.label || 'this member';
 
   // Intercept standard form dispatch to open our modal first
   const handleFormSubmit = (e) => {
@@ -210,7 +211,12 @@ export default function RatingForm() {
             </div>
 
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
-              Are you sure you want to submit a score of <strong className="text-indigo-600 dark:text-indigo-400">{score}/10</strong> for <strong>{selectedUserLabel}</strong>? Ratings are permanent and immutable.
+              Are you sure you want to submit a score of{' '}
+              <strong className="text-indigo-600 dark:text-indigo-400">
+                {score}/10
+              </strong>{' '}
+              for <strong>{selectedUserLabel}</strong>? Ratings are permanent
+              and immutable.
             </p>
 
             <div className="flex items-center justify-end gap-3">
@@ -222,7 +228,7 @@ export default function RatingForm() {
               >
                 Cancel
               </Btn>
-              
+
               <Btn
                 type="button"
                 variant="success"
