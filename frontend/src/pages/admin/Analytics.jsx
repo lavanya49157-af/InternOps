@@ -66,9 +66,10 @@ export default function Analytics() {
   }, [month, monthOptions]);
 
   const { data: departments = [], isLoading: loadingDepts } = useQuery({
-    queryKey: ['departmentsList'],
-    queryFn: () => api.get('/departments').then((r) => r.data),
-  });
+  queryKey: ['departmentsList'],
+  queryFn: () => api.get('/departments').then((r) => r.data),
+  staleTime: 5 * 60 * 1000, // 5 minutes
+});
 
   const departmentOptions = [
     { value: '', label: 'Select Department' },
